@@ -1,0 +1,22 @@
+PANDUAN SINGKAT - PWA SARPRAS
+
+A. Perbarui Apps Script (wajib, sekali saja)
+1. Ganti isi Index.html dan Code.gs di proyek Apps Script dengan file versi baru.
+2. Deploy > Manage deployments > ikon pensil > Version: "New version" > Deploy.
+   (Tetap pakai deployment yang sama agar URL /exec tidak berubah.)
+3. Pastikan: Execute as = Me, Who has access = Anyone.
+   Jika akses dibatasi akun tertentu, halaman login Google menolak dibuka di dalam PWA (layar kosong).
+
+B. Hosting PWA (harus HTTPS)
+Unggah SELURUH isi folder sarpras-pwa (index.html, manifest.webmanifest, sw.js, folder icons)
+ke salah satu: GitHub Pages, Netlify, Cloudflare Pages, atau Firebase Hosting.
+Letakkan di root/folder yang sama - jangan dipisah.
+
+C. Pasang di HP
+- Android (Chrome): buka URL hosting > menu titik tiga > "Instal aplikasi" / "Tambahkan ke layar utama".
+- iPhone (Safari): tombol Bagikan > "Tambah ke Layar Utama".
+
+D. Jika URL Apps Script berubah
+Edit konstanta APP_URL di index.html (bagian <script>).
+
+Catatan: data tetap butuh internet (disimpan di Google Sheets). Mode offline hanya menampilkan layar "tidak ada koneksi".

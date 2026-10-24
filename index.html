@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <title>Sarpras | Worklog & Inventory</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#132a3a">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Sarpras">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <style>
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;background:#132a3a;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:#dce8ee}
+    body{overflow:hidden;overscroll-behavior:none}
+    #shell{position:fixed;inset:0;padding-top:env(safe-area-inset-top);background:#132a3a}
+    #app{width:100%;height:100%;border:0;background:#f4f7f9;display:block}
+    .overlay{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:#132a3a;text-align:center;padding:24px;z-index:5}
+    .overlay[hidden]{display:none}
+    .mark{width:72px;height:72px;border-radius:22px;background:#d8f1e9;color:#176a65;display:grid;place-items:center;font-size:36px;font-weight:800}
+    .spin{width:28px;height:28px;border:3px solid #355364;border-top-color:#45b8a7;border-radius:50%;animation:s 1s linear infinite}
+    @keyframes s{to{transform:rotate(360deg)}}
+    button{font:600 15px system-ui;min-height:46px;padding:0 22px;border:0;border-radius:12px;background:#177e78;color:#fff}
+    p{margin:0;max-width:320px;line-height:1.5;color:#9fb5c2;font-size:14px}
+    h1{margin:0;font-size:18px;color:#fff}
+  </style>
+</head>
+<body>
+  <div id="shell"><iframe id="app" title="Sarpras" allow="camera; fullscreen; clipboard-write" referrerpolicy="no-referrer-when-downgrade"></iframe></div>
+
+  <div class="overlay" id="loading"><div class="mark">S</div><div class="spin"></div><p>Memuat Sarpras…</p></div>
+
+  <div class="overlay" id="offline" hidden>
+    <div class="mark">S</div>
+    <h1>Tidak ada koneksi internet</h1>
+    <p>Sarpras membutuhkan internet untuk membaca dan menyimpan data ke Google Sheets. Periksa koneksi lalu coba lagi.</p>
+    <button type="button" id="retry">Coba lagi</button>
+  </div>
+
+<script>
+  // GANTI jika URL deployment Apps Script berubah (setelah "New deployment")
+  const APP_URL = 'https://script.google.com/macros/s/AKfycbytzW485OTKgJwGinop6ogVM_rYMwONXl9Y3r0EpuiW_Iq4fXiTRC81V3LcmdDOxqg1/exec';
+
+  const frame = document.getElementById('app');
+  const loading = document.getElementById('loading');
+  const offline = document.getElementById('offline');
+  let slowTimer;
+
+  function start() {
+    if (!navigator.onLine) { loading.hidden = true; offline.hidden = false; return; }
+    offline.hidden = true; loading.hidden = false;
+    frame.src = APP_URL;
+    clearTimeout(slowTimer);
+    // Apps Script kadang butuh beberapa detik saat "cold start"
+    slowTimer = setTimeout(() => {
+      loading.querySelector('p').textContent = 'Masih memuat… koneksi atau server Google sedang lambat.';
+    }, 8000);
+  }
+
+  frame.addEventListener('load', () => { clearTimeout(slowTimer); loading.hidden = true; });
+  window.addEventListener('online', start);
+  window.addEventListener('offline', () => { offline.hidden = false; });
+  document.getElementById('retry').addEventListener('click', start);
+
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+  }
+  start();
+</script>
+</body>
+</html>
